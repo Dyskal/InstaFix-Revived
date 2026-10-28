@@ -1,19 +1,6 @@
 package main
 
-import (
-	"bytes"
-	_ "embed"
-	"net/http"
-	"time"
-)
-
-//go:embed video/instagram7-reel/out/instagram7-test-reel.mp4
-var demoReelMP4 []byte
-
-//go:embed video/instagram7-reel/out/instagram7-test-reel-poster.webp
-var demoReelPosterWebP []byte
-
-var demoReelModified = time.Date(2026, time.August, 8, 0, 0, 0, 0, time.UTC)
+import "net/http"
 
 const faviconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
 <defs><linearGradient id="g" x1="7" y1="57" x2="57" y2="7" gradientUnits="userSpaceOnUse"><stop stop-color="#ffb000"/><stop offset=".42" stop-color="#ff2768"/><stop offset="1" stop-color="#7b3cff"/></linearGradient></defs>
@@ -29,18 +16,4 @@ func serveFavicon(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Cache-Control", "public, max-age=604800, immutable")
 	w.Header().Set("Cloudflare-CDN-Cache-Control", "public, max-age=604800")
 	_, _ = w.Write([]byte(faviconSVG))
-}
-
-func serveDemoReelVideo(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "video/mp4")
-	w.Header().Set("Cache-Control", "public, max-age=604800, immutable")
-	w.Header().Set("Cloudflare-CDN-Cache-Control", "public, max-age=604800")
-	http.ServeContent(w, r, "instagram7-test-reel.mp4", demoReelModified, bytes.NewReader(demoReelMP4))
-}
-
-func serveDemoReelPoster(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "image/webp")
-	w.Header().Set("Cache-Control", "public, max-age=604800, immutable")
-	w.Header().Set("Cloudflare-CDN-Cache-Control", "public, max-age=604800")
-	http.ServeContent(w, r, "instagram7-test-reel-poster.webp", demoReelModified, bytes.NewReader(demoReelPosterWebP))
 }

@@ -9,13 +9,10 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY *.go ./
-COPY BingSiteAuth.xml ./
 COPY handlers/ ./handlers/
 COPY utils/ ./utils/
 COPY observability/ ./observability/
 COPY views/ ./views/
-COPY video/instagram7-reel/out/instagram7-test-reel.mp4 ./video/instagram7-reel/out/instagram7-test-reel.mp4
-COPY video/instagram7-reel/out/instagram7-test-reel-poster.webp ./video/instagram7-reel/out/instagram7-test-reel-poster.webp
 
 ARG TARGETARCH
 ARG COMMIT_SHA=dev

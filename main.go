@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	_ "embed"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -25,9 +24,6 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	bolt "go.etcd.io/bbolt"
 )
-
-//go:embed BingSiteAuth.xml
-var bingSiteAuthXML []byte
 
 const telegramWebPageMaxInlineVideoBytes int64 = 20 << 20
 
@@ -230,10 +226,6 @@ func main() {
 	r.Get("/version", healthHandler)
 	r.Get("/favicon.svg", serveFavicon)
 	r.Get("/favicon.ico", serveFavicon)
-	r.Get("/assets/demo/instagram7-test-reel.mp4", serveDemoReelVideo)
-	r.Head("/assets/demo/instagram7-test-reel.mp4", serveDemoReelVideo)
-	r.Get("/assets/demo/instagram7-test-reel-poster.webp", serveDemoReelPoster)
-	r.Head("/assets/demo/instagram7-test-reel-poster.webp", serveDemoReelPoster)
 	r.Get("/api/{postID}", func(w http.ResponseWriter, r *http.Request) {
 		postID := chi.URLParam(r, "postID")
 		preferVideo := strings.EqualFold(r.URL.Query().Get("kind"), "reel") || strings.EqualFold(r.URL.Query().Get("prefer"), "video")
@@ -369,14 +361,6 @@ func main() {
 	}
 	r.Get("/sitemap.xml", sitemapHandler)
 	r.Head("/sitemap.xml", sitemapHandler)
-
-	bingVerificationHandler := func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/xml; charset=utf-8")
-		w.Header().Set("Cache-Control", "public, max-age=86400")
-		_, _ = w.Write(bingSiteAuthXML)
-	}
-	r.Get("/BingSiteAuth.xml", bingVerificationHandler)
-	r.Head("/BingSiteAuth.xml", bingVerificationHandler)
 
 	r.Get("/site-preview.svg", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "image/svg+xml; charset=utf-8")

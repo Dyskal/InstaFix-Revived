@@ -131,20 +131,6 @@ var howInstagram7WorksTemplate = template.Must(template.New("how-instagram7-work
         <p>InstaFix Revived turns a public Instagram publication URL into a preview-focused share link. The original publication stays the destination; the receiving chat app gets cleaner metadata and playable media when available.</p>
       </section>
 
-      <section class="live-example" aria-labelledby="live-example-title">
-        <div class="live-copy">
-          <span class="eyebrow">Live backend example</span>
-          <h2 id="live-example-title">This Reel is loaded through this instance.</h2>
-          <p>This example uses an included demo asset, so it can be played without requesting a fresh media URL from Instagram.</p>
-          <div class="domain-change" aria-label="Convert an Instagram link for this instance"><span>instagram.com</span><b aria-hidden="true">→</b><span>__INSTAFIX_HOST__</span></div>
-          <a class="cta" href="__INSTAFIX_BASE_URL__/reels/Dbidjf_C4nf/">Open this instance's Reel example</a>
-        </div>
-        <figure class="live-media">
-          <video controls muted playsinline preload="metadata" poster="/assets/demo/instagram7-test-reel-poster.webp"><source src="/assets/demo/instagram7-test-reel.mp4" type="video/mp4">Your browser cannot play this Reel preview.</video>
-          <figcaption>A bundled demonstration video, served locally by InstaFix Revived.</figcaption>
-        </figure>
-      </section>
-
       <section aria-labelledby="steps-title">
         <div class="section-heading"><h2 id="steps-title">Three steps, no extra modes</h2><p>The whole workflow stays deliberately small: convert, copy, and send.</p></div>
         <ol class="steps">

@@ -36,18 +36,14 @@
 !scripts/*.yml
 !scripts/*.yaml
 !scripts/*.py
-!BingSiteAuth.xml
 !examples/cloudflare-worker/
 !examples/cloudflare-worker/README.md
 !examples/cloudflare-worker/src/
 !examples/cloudflare-worker/src/*.js
 !examples/cloudflare-worker/*.jsonc
 
-# Keep the two public test/demo assets required by the current Dockerfile.
+# Ignore local demo media.
 /video/instagram7-reel/**
-!/video/instagram7-reel/out/
-!/video/instagram7-reel/out/instagram7-test-reel.mp4
-!/video/instagram7-reel/out/instagram7-test-reel-poster.webp
 
 # Never track local/session secrets.
 secrets/

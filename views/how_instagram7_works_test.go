@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestHowInstagram7WorksPageUsesLiveExample(t *testing.T) {
+func TestHowInstagram7WorksPage(t *testing.T) {
 	var out bytes.Buffer
 	if !HowInstagram7Works(&out) {
 		t.Fatal("HowInstagram7Works returned false")
@@ -15,8 +15,6 @@ func TestHowInstagram7WorksPageUsesLiveExample(t *testing.T) {
 	for _, check := range []string{
 		`rel="canonical" href="http://localhost:3000/how-instagram7-works"`,
 		`Fix Instagram Reel previews on your own domain.`,
-		`poster="/assets/demo/instagram7-test-reel-poster.webp"`,
-		`src="/assets/demo/instagram7-test-reel.mp4"`,
 		`Convert the Instagram URL`,
 		`Frequently asked questions`,
 		`href="/#converter"`,

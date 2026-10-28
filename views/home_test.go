@@ -41,17 +41,12 @@ func TestHomeConverterUsesSingleShortcodePathAndChatPreview(t *testing.T) {
 func TestHomeLiveDemoUsesRealConverterOncePerSession(t *testing.T) {
 	for _, check := range []string{
 		`const DEMO_REEL_URL = 'https://www.instagram.com/reels/Dbidjf_C4nf/';`,
-		`const DEMO_REEL_ID = 'Dbidjf_C4nf';`,
-		`const DEMO_VIDEO_URL = '/assets/demo/instagram7-test-reel.mp4';`,
-		`const DEMO_POSTER_URL = '/assets/demo/instagram7-test-reel-poster.webp';`,
 		`const DEMO_SESSION_KEY = 'instafix-revived.live-demo.seen.v2';`,
-		`Live demo using our own Instagram Reel`,
 		`Math.round(1200 + Math.random() * 600)`,
 		`window.sessionStorage.getItem(DEMO_SESSION_KEY)`,
 		`window.sessionStorage.setItem(DEMO_SESSION_KEY, '1')`,
 		`'__INSTAFIX_BASE_URL__' + new URL(DEMO_REEL_URL).pathname`,
 		`convertUrl({preserveInput: true})`,
-		`renderOwnedDemoVideo()`,
 		`fetch(apiUrl, {signal: requestController.signal})`,
 		`new AbortController()`,
 		`prefers-reduced-motion: reduce`,

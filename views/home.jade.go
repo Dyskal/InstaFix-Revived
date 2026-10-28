@@ -1617,9 +1617,6 @@ const homeHTML = `<!DOCTYPE html>
       const shortcodeRe = /^[A-Za-z0-9_-]{5,64}$/;
       const blockedUpstreamLabelRe = /og[\s_-]*instagram/i;
       const DEMO_REEL_URL = 'https://www.instagram.com/reels/Dbidjf_C4nf/';
-      const DEMO_REEL_ID = 'Dbidjf_C4nf';
-      const DEMO_VIDEO_URL = '/assets/demo/instagram7-test-reel.mp4';
-      const DEMO_POSTER_URL = '/assets/demo/instagram7-test-reel-poster.webp';
       const DEMO_SESSION_KEY = 'instafix-revived.live-demo.seen.v2';
       let previewTimer = null;
       let previewAbortController = null;
@@ -1767,23 +1764,6 @@ const homeHTML = `<!DOCTYPE html>
         preloadMediaBackground(postId, imageDiv, fallbackMessage || 'Preview image unavailable. The fixed link can still be copied.', onReady);
       }
 
-      function renderOwnedDemoPoster() {
-        previewMediaContainer.innerHTML = '';
-        const imageDiv = document.createElement('div');
-        imageDiv.className = 'embed-media-mockup';
-        previewMediaContainer.appendChild(imageDiv);
-        const tester = new Image();
-        tester.onload = function() {
-          imageDiv.style.backgroundImage = "linear-gradient(rgba(15, 23, 42, 0.08), rgba(15, 23, 42, 0.16)), url('" + DEMO_POSTER_URL + "')";
-          if (demoActive && !demoUserHasTakenOver) demoStatus.textContent = 'Demo poster ready';
-        };
-        tester.onerror = function() {
-          imageDiv.innerHTML = '<div class="media-fallback">Demo media is temporarily unavailable. The fixed link can still be copied.</div>';
-          if (demoActive && !demoUserHasTakenOver) demoStatus.textContent = 'Converted link ready';
-        };
-        tester.src = DEMO_POSTER_URL;
-      }
-
       function renderVideo(postId, sourceUrl, posterUrl, onReady, onError) {
         previewMediaContainer.innerHTML = '';
         const video = document.createElement('video');
@@ -1803,16 +1783,6 @@ const homeHTML = `<!DOCTYPE html>
           renderImage(postId, 'Video stream is temporarily unavailable. The fixed link can still be copied.');
         };
         previewMediaContainer.appendChild(video);
-      }
-
-      function renderOwnedDemoVideo() {
-        previewAuthor.textContent = '@insta7_com';
-        previewCaption.textContent = 'Convert link. Share better. Live demo using our own Instagram Reel.';
-        renderVideo(DEMO_REEL_ID, DEMO_VIDEO_URL, DEMO_POSTER_URL, function() {
-          if (demoActive && !demoUserHasTakenOver) demoStatus.textContent = 'Demo preview ready';
-        }, function() {
-          renderOwnedDemoPoster();
-        });
       }
 
       function loadPreview(postId, preferVideo) {
@@ -1844,14 +1814,8 @@ const homeHTML = `<!DOCTYPE html>
               renderVideo(postId, '', '', function() {
                 if (demoActive && !demoUserHasTakenOver) demoStatus.textContent = 'Real preview ready';
               }, function() {
-                if (demoActive && postId === DEMO_REEL_ID && !demoUserHasTakenOver) {
-                  renderOwnedDemoVideo();
-                  return;
-                }
                 renderImage(postId, 'Video stream is temporarily unavailable. The fixed link can still be copied.');
               });
-            } else if (demoActive && postId === DEMO_REEL_ID && !demoUserHasTakenOver) {
-              renderOwnedDemoVideo();
             } else {
               renderImage(postId, '', function() {
                 if (demoActive && !demoUserHasTakenOver) demoStatus.textContent = 'Preview image ready';
@@ -1866,9 +1830,7 @@ const homeHTML = `<!DOCTYPE html>
             if (lastPreviewKey !== requestKey) return;
             previewAuthor.textContent = '@instagram_creator';
             previewCaption.textContent = 'The fixed link is ready. Detailed metadata is temporarily unavailable in this on-page preview.';
-            if (demoActive && postId === DEMO_REEL_ID && !demoUserHasTakenOver) {
-              renderOwnedDemoVideo();
-            } else if (preferVideo) {
+            if (preferVideo) {
               renderImage(postId, 'Video metadata is temporarily unavailable. The fixed link can still be copied.');
             } else {
               renderImage(postId);
