@@ -577,6 +577,20 @@ def auth_get(url, headers, post_id="", account=None, timeout=None, stream=False,
     if response.status_code in REDIRECT_STATUSES:
         location = response.headers.get("location", "")
         code = classify_redirect_location(location)
+        if code == "redirected" and "/api/v1/oembed/" in location:
+            redirect_count = 0
+            while code == "redirected" and "/api/v1/oembed/" in location and redirect_count < 3:
+                with contextlib.suppress(Exception):
+                    response.close()
+                if location.startswith("/"):
+                    location = "https://www.instagram.com" + location
+                response = requests.get(location, headers=headers, impersonate=IMPERSONATE, timeout=timeout or TIMEOUT, allow_redirects=False, stream=stream)
+                if response.status_code not in REDIRECT_STATUSES:
+                    return response
+                location = response.headers.get("location", "")
+                code = classify_redirect_location(location)
+                redirect_count += 1
+
         if mark_account_failures and code in AUTH_CIRCUIT_CODES:
             if account is not None:
                 mark_account_failure(account.account_id, code, post_id)
@@ -748,6 +762,18 @@ def oembed(post_id, forced_account=None, bypass_cache=False):
     }
     try:
         r = auth_get(url, headers, post_id=post_id, account=account, stream=True)
+    except HelperError as exc:
+        if exc.code == "redirected" and FETCH_MEDIA_INFO_FALLBACK:
+            log("warn", "auth oembed redirected; trying media info fallback", post_id=post_id, error=str(exc)[:120])
+            try:
+                payload = media_info_payload(post_id, str(shortcode_to_media_id(post_id)), account, post_url)
+                store_auth_payload(post_id, payload)
+                return payload
+            except Exception as fallback_exc:
+                cache_negative(post_id, exc.code, fallback_exc, account_id)
+                raise exc
+        cache_negative(post_id, exc.code, exc, account_id)
+        raise
     except Exception as exc:
         code = classify_exception(exc)
         record_account_failure(account, code, exc, "oembed")
