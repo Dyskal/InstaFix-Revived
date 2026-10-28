@@ -104,16 +104,6 @@ func Embed(v *model.ViewsData, wr io.Writer) {
 		buffer.WriteString(embed__15)
 		WriteEscString(v.VideoURL, buffer)
 		buffer.WriteString(embed__16)
-
-	}
-	if v.VideoURL != "" || v.ImageURL != "" {
-		if v.Site != "" {
-			buffer.WriteString(`<meta property="og:site_name" content="`)
-			WriteEscString(v.Site, buffer)
-			buffer.WriteString(embed__3)
-		} else {
-			buffer.WriteString(embed__17)
-		}
 	}
 	buffer.WriteString(embed__1)
 	WriteEscString(v.URL, buffer)

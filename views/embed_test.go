@@ -41,6 +41,7 @@ func TestEmbedVideoUsesOGVideoWithoutTwitterPlayerCard(t *testing.T) {
 		}
 	}
 	for _, unwanted := range []string{
+		`name="twitter:creator"`,
 		`name="twitter:player"`,
 		`name="twitter:player:stream"`,
 		`name="twitter:player:width"`,
@@ -126,5 +127,20 @@ func TestEmbedCanSuppressMetaRefresh(t *testing.T) {
 	}
 	if !strings.HasSuffix(html, `</head><body></body></html>`) {
 		t.Fatalf("embed HTML should close with an empty body:\n%s", html)
+	}
+}
+
+func TestOEmbedOmitsProviderMetadata(t *testing.T) {
+	var buf bytes.Buffer
+	OEmbed(&model.OEmbedData{
+		Text: `@user`,
+		URL:  "https://instagram.com/p/CODE/",
+	}, &buf)
+
+	json := buf.String()
+	for _, unwanted := range []string{`provider_name`, `provider_url`} {
+		if strings.Contains(json, unwanted) {
+			t.Fatalf("oEmbed JSON must not contain %s: %s", unwanted, json)
+		}
 	}
 }

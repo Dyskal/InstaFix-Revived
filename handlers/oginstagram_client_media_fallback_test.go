@@ -37,7 +37,6 @@ func TestTelegramClientMediaFallbackKeepsInstagram7Metadata(t *testing.T) {
 	}
 	body := recorder.Body.String()
 	for _, want := range []string{
-		`property="og:site_name" content="InstaFix Revived"`,
 		`property="og:title" content="@creator_name"`,
 		`property="og:description" content="Creator caption"`,
 		`https://instagram7.test/offload/DbClientFallback/1.mp4?delivery=telegram-edge-stream-v1`,
@@ -46,6 +45,9 @@ func TestTelegramClientMediaFallbackKeepsInstagram7Metadata(t *testing.T) {
 		if !strings.Contains(body, want) {
 			t.Fatalf("expected %q in fallback HTML: %s", want, body)
 		}
+	}
+	if strings.Contains(body, `property="og:site_name"`) {
+		t.Fatalf("fallback must preserve the provider-free embed appearance: %s", body)
 	}
 	if strings.Contains(body, `content="OGInstagram"`) || strings.Contains(body, `content="OG Instagram"`) {
 		t.Fatalf("upstream branding leaked into visible preview metadata: %s", body)

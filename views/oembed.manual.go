@@ -8,9 +8,8 @@ import (
 )
 
 const (
-	oembed__0 = `{"author_name": `
-	oembed__1 = `,"author_url": "`
-	oembed__2 = `","provider_name": "InstaFix","provider_url": "https://github.com/Wikidepia/InstaFix","title": "Instagram","type": "link","version": "1.0"}`
+	oembed__0 = `{"title": `
+	oembed__1 = `,"type": "link","version": "1.0"}`
 )
 
 func OEmbed(o *model.OEmbedData, wr io.Writer) {
@@ -19,7 +18,4 @@ func OEmbed(o *model.OEmbedData, wr io.Writer) {
 	buffer.WriteString(oembed__0)
 	WriteAll(o.Text, false, buffer) // Escape in handlers
 	buffer.WriteString(oembed__1)
-	WriteAll(o.URL, false, buffer) // Escape in handlers
-	buffer.WriteString(oembed__2)
-
 }

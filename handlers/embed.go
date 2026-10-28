@@ -244,7 +244,6 @@ func Embed(w http.ResponseWriter, r *http.Request) {
 	var sb strings.Builder
 	sb.Grow(32) // 32 bytes should be enough for most cases
 	viewsData.Title = "@" + item.Username
-	viewsData.Creator = "@" + item.Username
 	viewsData.ArticleAuthor = "https://www.instagram.com/" + item.Username + "/"
 	// Gallery do not have any caption
 	if !isGallery {
@@ -311,6 +310,7 @@ func Embed(w http.ResponseWriter, r *http.Request) {
 		}
 		viewsData.VideoURL = videoRoute
 
+		viewsData.OEmbedURL = publicBaseURL + "/oembed?text=" + url.QueryEscape(viewsData.Title) + "&url=" + viewsData.URL
 	}
 	viewsData.NoRedirect = true
 	if isDirect {
