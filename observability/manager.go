@@ -1547,12 +1547,25 @@ func (m *Manager) Middleware(next http.Handler) http.Handler {
 			addEstimate(m.posts, p)
 		}
 		m.mu.Unlock()
-		slog.Info("request completed", "event", "request", "method", r.Method, "path", r.URL.Path, "status", code, "duration_ms", time.Since(start).Milliseconds(), "client", clientClass(r.UserAgent()))
+		slog.Info("request completed",
+			"event", "request",
+			"method", r.Method,
+			"path", r.URL.Path,
+			"status", code,
+			"duration_ms", time.Since(start).Milliseconds(),
+			"client", clientClass(r.UserAgent()),
+			"user_agent", r.UserAgent(),
+			"cf_ray", r.Header.Get("CF-Ray"),
+		)
 	})
 }
 
 func clientIP(r *http.Request) string {
-	v := strings.TrimSpace(strings.Split(r.Header.Get("X-Forwarded-For"), ",")[0])
+	v := strings.TrimSpace(r.Header.Get("CF-Connecting-IP"))
+	if net.ParseIP(v) != nil {
+		return v
+	}
+	v = strings.TrimSpace(strings.Split(r.Header.Get("X-Forwarded-For"), ",")[0])
 	if net.ParseIP(v) != nil {
 		return v
 	}

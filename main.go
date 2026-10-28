@@ -51,9 +51,22 @@ func main() {
 	remoteScraperAddr := flag.String("remote-scraper", "", "Remote scraper address (https://github.com/Wikidepia/InstaFix-remote-scraper)")
 	videoProxyAddr := flag.String("video-proxy-addr", "", "Video proxy address (https://github.com/Wikidepia/InstaFix-proxy)")
 	flag.Parse()
-
 	statelessExperiment := strings.EqualFold(strings.TrimSpace(os.Getenv("INSTAFIX_EXPERIMENT_MODE")), "stateless_cloudrun")
-	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo})))
+	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level: slog.LevelInfo,
+		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
+			// Rename "level" to "severity" for Google Cloud
+			if a.Key == slog.LevelKey {
+				level := a.Value.Any().(slog.Level)
+				return slog.String("severity", strings.ToUpper(level.String()))
+			}
+			// Rename "msg" to "message" for Google Cloud
+			if a.Key == slog.MessageKey {
+				return slog.String("message", a.Value.String())
+			}
+			return a
+		},
+	})))
 	observability.Configure(observability.Config{TelegramToken: os.Getenv("TELEGRAM_BOT_TOKEN"), TelegramChat: os.Getenv("TELEGRAM_CHAT_ID"), ReportHourUTC: observability.EnvReportHour()})
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()

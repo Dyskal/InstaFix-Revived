@@ -1,0 +1,60 @@
+# Stage 1: Build the Go app
+FROM golang:1.27.3 AS app-builder
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+COPY *.go ./
+COPY handlers/ ./handlers/
+COPY utils/ ./utils/
+COPY observability/ ./observability/
+COPY views/ ./views/
+RUN CGO_ENABLED=0 GOOS=linux go build \
+    -tags netgo,osusergo \
+    -ldflags "-s -w" \
+    -o instafix
+
+# Stage 2: Build the final image with Python and Go
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    AUTH_HELPER_URL=http://127.0.0.1:3200 \
+    AUTH_HELPER_LISTEN=127.0.0.1:3200 \
+    INSTAGRAM_COOKIE_DIR=/app/cookies \
+    GOMEMLIMIT=384MiB \
+    GOGC=50
+
+WORKDIR /app
+
+# Install auth-helper dependencies
+COPY auth-helper/requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy auth-helper python app
+COPY auth-helper/app.py ./
+
+# Copy Go binary from builder
+COPY --from=app-builder /app/instafix /app/instafix
+
+# Install CA certificates
+RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+
+# Create a startup script to split multi-line secrets and run apps
+RUN echo '#!/bin/sh\n\
+mkdir -p /app/cookies\n\
+if [ -f /run/secrets/instagram_cookie ]; then\n\
+    i=1\n\
+    while IFS= read -r line || [ -n "$line" ]; do\n\
+        if [ -n "$line" ]; then\n\
+            echo "$line" > "/app/cookies/cookie_$i.txt"\n\
+            i=$((i+1))\n\
+        fi\n\
+    done < /run/secrets/instagram_cookie\n\
+fi\n\
+python /app/app.py &\n\
+exec /app/instafix\n\
+' > /app/start.sh && chmod +x /app/start.sh
+
+EXPOSE 3000
+
+CMD ["/app/start.sh"]

@@ -94,7 +94,11 @@ class CookieAccount:
 
 
 def log(level, msg, **fields):
-    fields.update({"level": level, "msg": msg, "time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())})
+    # Google Cloud Logging uses "severity" instead of "level", and expects uppercase strings
+    severity_map = {"warn": "WARNING", "error": "ERROR", "info": "INFO", "debug": "DEBUG"}
+    severity = severity_map.get(level.lower(), level.upper())
+    # Google Cloud prefers "message" instead of "msg" for the primary log payload
+    fields.update({"severity": severity, "message": msg, "time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())})
     print(json.dumps(fields, ensure_ascii=False), flush=True)
 
 

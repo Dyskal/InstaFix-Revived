@@ -1,0 +1,50 @@
+name: Build and Push to Google Cloud
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+# Required for Workload Identity Federation OIDC tokens
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v7
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v3
+      with:
+        workload_identity_provider: ${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}
+        service_account: ${{ secrets.SERVICE_ACCOUNT }}
+
+    - name: Configure Docker
+      run: gcloud auth configure-docker ${{ secrets.REGION }}-docker.pkg.dev
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v4
+
+    - name: Build and Push
+      uses: docker/build-push-action@v7
+      with:
+        context: .
+        file: Dockerfile.standalone
+        push: true
+        tags: ${{ secrets.IMAGE_NAME }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    # Optional: Automatically deploy to Cloud Run
+    - name: Deploy to Cloud Run
+      uses: google-github-actions/deploy-cloudrun@v3
+      with:
+        service: instafix-${{ secrets.PROJECT_ID }}
+        region: ${{ secrets.REGION }}
+        image: ${{ secrets.IMAGE_NAME }}
+        secrets: |
+          /run/secrets/instagram_cookie=instagram-cookie:latest

@@ -25,12 +25,14 @@
 !.env.example
 !LICENSE
 !Dockerfile
+!Dockerfile.*
 !auth-helper/*.py
 !auth-helper/Dockerfile
 !auth-helper/requirements.txt
 !Caddyfile
 !docker-compose.example.yml
 !.github/assets/*.jpg
+!.github/workflows/*.yml
 !scripts/*.yml
 !scripts/*.yaml
 !scripts/*.py
